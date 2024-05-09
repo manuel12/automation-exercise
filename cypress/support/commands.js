@@ -26,6 +26,8 @@
 
 /// <reference types="cypress" />
 
+require("cypress-downloadfile/lib/downloadFileCommand")
+
 Cypress.Commands.add("fillLoginForm", (accountData) => {
     const { email, password } = accountData
 
@@ -104,7 +106,7 @@ Cypress.Commands.add("fillPaymentDetails", (paymentData) => {
     cy.get('[data-qa="pay-button"]').click()
 })
 
-Cypress.Commands.add("addProducToCart", (productNumber) => {
+Cypress.Commands.add("addProductToCart", (productNumber) => {
     // Hover over the element with class "product-image-wrapper"
     cy.get(".product-image-wrapper")
         .eq(productNumber - 1)
@@ -112,8 +114,6 @@ Cypress.Commands.add("addProducToCart", (productNumber) => {
         .within(() => {
             cy.get(".add-to-cart").first().click()
         })
-
-    cy.contains("Continue Shopping").click()
 })
 
 Cypress.Commands.add("getUserByAPI", (email) => {
