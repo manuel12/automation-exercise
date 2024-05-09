@@ -71,7 +71,10 @@ describe("Automation Exercises", () => {
         it("Test Case 3: Login User with incorrect email and password", () => {
             cy.contains("Signup / Login").click()
 
-            cy.fillLoginForm(registerData)
+            cy.fillLoginForm({
+                email: "invalidEmail@gmail.com",
+                password: registerData.password,
+            })
 
             cy.contains("Your email or password is incorrect!")
         })
@@ -194,11 +197,11 @@ describe("Automation Exercises", () => {
         })
 
         it("Test Case 10: Verify Subscription in home page", () => {
-            cy.get(".footer").scrollIntoView()
-            cy.get(".footer").within(() => {
+            cy.get("#footer").scrollIntoView()
+            cy.get("#footer").within(() => {
                 cy.contains("Subscription")
 
-                cy.get("#email").type(registerData.email)
+                cy.get("#susbscribe_email").type(registerData.email)
                 cy.get("#subscribe").click()
 
                 cy.get("#success-subscribe")
@@ -213,9 +216,9 @@ describe("Automation Exercises", () => {
         it("Test Case 11: Verify Subscription in Cart page", () => {
             cy.contains("Cart").click()
 
-            cy.get(".footer").scrollIntoView()
+            cy.get("#footer").scrollIntoView()
 
-            cy.get(".footer").within(() => {
+            cy.get("#footer").within(() => {
                 cy.contains("Subscription")
 
                 cy.get("#susbscribe_email").type(registerData.email)
@@ -233,7 +236,11 @@ describe("Automation Exercises", () => {
         it("Test Case 12: Add Products in Cart", () => {
             cy.contains("Products").click()
 
-            cy.addProducToCart(2)
+            cy.addProductToCart(1)
+
+            cy.contains("Continue Shopping").click()
+
+            cy.addProductToCart(2)
 
             cy.contains("View Cart").click()
 
@@ -293,7 +300,9 @@ describe("Automation Exercises", () => {
         it("Test Case 14: Place Order: Register while Checkout", () => {
             cy.contains("Products").click()
 
-            cy.addProducToCart(1)
+            cy.addProductToCart(1)
+
+            cy.contains("Continue Shopping").click()
 
             cy.contains("Cart").click()
 
@@ -334,7 +343,9 @@ describe("Automation Exercises", () => {
 
             cy.contains("Logged in as Manuel")
 
-            cy.addProducToCart(1)
+            cy.addProductToCart(1)
+
+            cy.contains("Continue Shopping").click()
 
             cy.contains("Cart").click()
 
@@ -385,7 +396,9 @@ describe("Automation Exercises", () => {
 
             cy.fillLoginForm(registerData)
 
-            cy.addProducToCart(1)
+            cy.addProductToCart(1)
+
+            cy.contains("Continue Shopping").click()
 
             cy.contains("Cart").click()
 
@@ -420,7 +433,9 @@ describe("Automation Exercises", () => {
         })
 
         it("Test Case 17: Remove Products From Cart", () => {
-            cy.addProducToCart(1)
+            cy.addProductToCart(1)
+
+            cy.contains("Continue Shopping").click()
 
             cy.contains("Cart").click()
 
@@ -541,6 +556,155 @@ describe("Automation Exercises", () => {
             cy.get("#product-43").should("be.visible")
         })
 
+        it("Test Case 21: Add review on product", () => {
+            cy.contains("Products").click()
+
+            cy.get("body").should("be.visible")
+
+            cy.url().should("eq", "https://automationexercise.com/products")
+
+            cy.get(".title")
+                .should("be.visible")
+                .and("contain.text", "All Products")
+
+            cy.get(".product-image-wrapper")
+                .first()
+                .within(() => {
+                    cy.contains("View Product").click()
+                })
+
+            cy.get("#name").type(registerData.name)
+
+            cy.get("#email").type(registerData.email)
+
+            cy.get("textarea").type("This is a great product!")
+
+            cy.get("#button-review").click()
+
+            cy.get(".alert-success")
+                .should("be.visible")
+                .and("contain.text", "Thank you for your review")
+        })
+
+        it("Test Case 22: Add to cart from Recommended items", () => {
+            cy.get(".recommended_items").scrollIntoView()
+
+            cy.get(".title")
+                .should("be.visible")
+                .and("contain.text", "recommended items")
+
+            cy.get(".recommended_items").within(() => {
+                cy.get(".add-to-cart").first().click({ force: true })
+            })
+
+            cy.contains("View Cart").click()
+
+            cy.get("#product-1").should("be.visible")
+        })
+    })
+
+    context("5.", () => {
+        beforeEach(() => {
+            cy.deleteUserByAPI(registerData)
+
+            cy.visit("https://automationexercise.com/")
+            cy.get("body").should("be.visible")
+        })
+
+        it("Test Case 23: Verify address details in checkout page", () => {
+            cy.signupUser(registerData)
+
+            cy.contains("Logged in as Manuel")
+
+            cy.addProductToCart(1)
+
+            cy.contains("Cart").click()
+
+            cy.get("body").should("be.visible")
+
+            cy.url().should(
+                "contain",
+                "https://automationexercise.com/view_cart",
+            )
+
+            cy.contains("Proceed To Checkout").click()
+
+            accountDataValuesToCheck.forEach((value) => {
+                cy.get("#address_delivery").should("contain.text", value)
+
+                cy.get("#address_invoice").should("contain.text", value)
+            })
+
+            cy.contains("Delete Account").click()
+
+            cy.get('[data-qa="account-deleted"]')
+                .should("be.visible")
+                .and("contain.text", "Account Deleted!")
+        })
+
+        it("Test Case 24: Download Invoice after purchase order", () => {
+            cy.addProductToCart(1)
+
+            cy.contains("Continue Shopping").click()
+
+            cy.contains("Cart").click()
+
+            cy.get("body").should("be.visible")
+
+            cy.url().should(
+                "contain",
+                "https://automationexercise.com/view_cart",
+            )
+
+            cy.contains("Proceed To Checkout").click()
+
+            cy.get(".modal-content a").click()
+            cy.fillSignupForm(registerData)
+            cy.fillAccountInformationForm(registerData)
+
+            cy.get("[data-qa=account-created]")
+                .should("be.visible")
+                .and("contain.text", "Account Created!")
+
+            cy.get("[data-qa=continue-button]").click()
+
+            cy.contains("Logged in as Manuel")
+
+            cy.contains("Cart").click()
+
+            cy.contains("Proceed To Checkout").click()
+
+            accountDataValuesToCheck.forEach((value) => {
+                cy.get("#address_delivery").should("contain.text", value)
+
+                cy.get("#address_invoice").should("contain.text", value)
+            })
+
+            cy.get(".form-control").type("I want to buy this items!")
+
+            cy.contains("Place Order").click()
+
+            cy.fillPaymentDetails(paymentData)
+
+            cy.get(".title").should("contain.text", "Order Placed!")
+
+            cy.contains("Congratulations! Your order has been confirmed!")
+
+            cy.contains("Download Invoice").click()
+
+            cy.downloadFile(
+                "https://automationexercise.com/payment_done/1400",
+                "Downloads",
+                "invoice.txt",
+            )
+
+            cy.contains("Delete Account").click()
+
+            cy.get('[data-qa="account-deleted"]')
+                .should("be.visible")
+                .and("contain.text", "Account Deleted!")
+        })
+
         it("Test Case 25: Verify Scroll Up using 'Arrow' button and Scroll Down functionality", () => {
             cy.get("#footer").scrollIntoView()
 
@@ -558,7 +722,7 @@ describe("Automation Exercises", () => {
                 )
         })
 
-        it.only("Test Case 26: Verify Scroll Up without 'Arrow' button and Scroll Down functionality", () => {
+        it("Test Case 26: Verify Scroll Up without 'Arrow' button and Scroll Down functionality", () => {
             // Scroll to the bottom of the page
             cy.window().then((win) => {
                 win.scrollTo(0, win.document.body.scrollHeight)
