@@ -1,0 +1,23 @@
+{
+    "name": "Manuel",
+    "email": "manuelpinedacabeza@gmail.com",
+    "password": "Testpass1!",
+
+    "days": "17",
+    "months": "12",
+    "years": "1990",
+    
+    "firstName": "Manuel",
+    "lastName": "Pineda",
+
+    "company": "Microsoft",
+    "address": "Reberger Strasse 6",
+
+    "country": "United States",
+    "state": "Texas",
+    "city": "Austin",
+    "zipcode": "111111",
+
+    "mobile": "111 1111 1111"
+    
+}
