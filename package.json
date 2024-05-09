@@ -12,6 +12,7 @@
   "devDependencies": {
     "@eslint/js": "^9.2.0",
     "cypress": "^13.9.0",
+    "cypress-downloadfile": "^1.2.3",
     "eslint": "^8.57.0",
     "eslint-plugin-cypress": "^2.14.0",
     "eslint-plugin-import": "^2.29.1"
