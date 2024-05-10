@@ -1,32 +1,17 @@
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-
 /// <reference types="cypress" />
 
 require("cypress-downloadfile/lib/downloadFileCommand")
+
+/**
+ *
+ *  --- UI METHODS ---
+ *
+ */
+
+/**
+ * Fills the login form with provided account data.
+ * @param {Object} accountData - Object containing email and password.
+ */
 
 Cypress.Commands.add("fillLoginForm", (accountData) => {
     const { email, password } = accountData
@@ -40,6 +25,11 @@ Cypress.Commands.add("fillLoginForm", (accountData) => {
     cy.get("[data-qa=login-button]").click()
 })
 
+/**
+ * Fills the signup form with provided account data.
+ * @param {Object} accountData - Object containing name and email.
+ */
+
 Cypress.Commands.add("fillSignupForm", (accountData) => {
     const { name, email } = accountData
 
@@ -51,6 +41,11 @@ Cypress.Commands.add("fillSignupForm", (accountData) => {
     cy.get("[data-qa=signup-email]").type(email)
     cy.get("[data-qa=signup-button]").click()
 })
+
+/**
+ * Fills the account information form with provided data.
+ * @param {Object} accountData - Object containing account information.
+ */
 
 Cypress.Commands.add("fillAccountInformationForm", (accountData) => {
     cy.get(":nth-child(1) > b").should("be.visible")
@@ -81,6 +76,11 @@ Cypress.Commands.add("fillAccountInformationForm", (accountData) => {
     cy.get("[data-qa=create-account]").click()
 })
 
+/**
+ * Signs up a user with provided account data.
+ * @param {Object} accountData - Object containing account data.
+ */
+
 Cypress.Commands.add("signupUser", (accountData) => {
     cy.contains("Signup / Login").click()
     cy.fillSignupForm(accountData)
@@ -92,6 +92,11 @@ Cypress.Commands.add("signupUser", (accountData) => {
 
     cy.get("[data-qa=continue-button]").click()
 })
+
+/**
+ * Fills the payment details form with provided data.
+ * @param {Object} paymentData - Object containing payment details.
+ */
 
 Cypress.Commands.add("fillPaymentDetails", (paymentData) => {
     const { nameOnCard, ccNumber, CVC, expirationMonth, expirationYear } =
@@ -106,6 +111,11 @@ Cypress.Commands.add("fillPaymentDetails", (paymentData) => {
     cy.get('[data-qa="pay-button"]').click()
 })
 
+/**
+ * Adds a product to the cart.
+ * @param {number} productNumber - Index of the product to add.
+ */
+
 Cypress.Commands.add("addProductToCart", (productNumber) => {
     // Hover over the element with class "product-image-wrapper"
     cy.get(".product-image-wrapper")
@@ -116,6 +126,28 @@ Cypress.Commands.add("addProductToCart", (productNumber) => {
         })
 })
 
+/**
+ * Retrieves an element and asserts its text content.
+ * @param {string} element - Selector of the element to retrieve.
+ * @param {string} text - Expected text content of the element.
+ */
+
+Cypress.Commands.add("getElementAndAssertText", (element, text) => {
+    cy.get(element).should("be.visible").and("contain.text", text)
+})
+
+/**
+ *
+ *  --- API METHODS ---
+ *
+ */
+
+/**
+ * Retrieves user details by making an API request.
+ * @param {string} email - Email of the user.
+ * @returns {Object} - Object containing response from the API.
+ */
+
 Cypress.Commands.add("getUserByAPI", (email) => {
     return cy.request({
         method: "GET",
@@ -123,6 +155,12 @@ Cypress.Commands.add("getUserByAPI", (email) => {
         failOnStatusCode: false,
     })
 })
+
+/**
+ * Registers a user by making an API request.
+ * @param {Object} accountData - Object containing account data.
+ * @returns {Object} - Object containing response from the API.
+ */
 
 Cypress.Commands.add("registerUserByAPI", (accountData) => {
     return cy.request({
@@ -154,6 +192,12 @@ Cypress.Commands.add("registerUserByAPI", (accountData) => {
         },
     })
 })
+
+/**
+ * Deletes a user account by making an API request.
+ * @param {Object} accountData - Object containing account data.
+ * @returns {Object} - Object containing response from the API.
+ */
 
 Cypress.Commands.add("deleteUserByAPI", (accountData) => {
     const { email, password } = accountData
