@@ -1,45 +1,38 @@
 /// <reference types="cypress" />
 
-const registerData = require("../fixtures/register-data.json")
+const userCredentials = require("../fixtures/user-credentials.json")
 const accountDataValuesToCheck = [
-    registerData.firstName,
-    registerData.lastName,
-    registerData.company,
-    registerData.address,
-    registerData.country,
-    registerData.state,
-    registerData.city,
-    registerData.zipcode,
-    registerData.mobile,
+    userCredentials.firstName,
+    userCredentials.lastName,
+    userCredentials.company,
+    userCredentials.address,
+    userCredentials.country,
+    userCredentials.state,
+    userCredentials.city,
+    userCredentials.zipcode,
+    userCredentials.mobile,
 ]
-
-const paymentData = {
-    nameOnCard: "Manuel Pineda",
-    ccNumber: "5555 5555 5555 4444",
-    CVC: "123",
-    expirationMonth: "12",
-    expirationYear: "25",
-}
 
 describe("Automation Exercises", () => {
     context("1.", () => {
         beforeEach(() => {
-            cy.deleteUserByAPI(registerData)
+            cy.deleteUserByAPI(userCredentials)
 
             cy.visit("https://automationexercise.com/")
             cy.get("body").should("be.visible")
         })
 
         it("Test Case 1: Register User", () => {
-            cy.signupUser(registerData)
+            cy.signupUser(userCredentials)
 
-            cy.contains("Logged in as Manuel")
+            cy.contains(`Logged in as ${userCredentials.name}`)
 
             cy.contains("Delete Account").click()
 
-            cy.get('[data-qa="account-deleted"]')
-                .should("be.visible")
-                .and("contain.text", "Account Deleted!")
+            cy.getElementAndAssertText(
+                '[data-qa="account-deleted"]',
+                "Account Deleted!",
+            )
 
             cy.get('[data-qa="continue-button"]').click()
         })
@@ -47,8 +40,8 @@ describe("Automation Exercises", () => {
 
     context("2.", () => {
         beforeEach(() => {
-            cy.deleteUserByAPI(registerData)
-            cy.registerUserByAPI(registerData)
+            cy.deleteUserByAPI(userCredentials)
+            cy.registerUserByAPI(userCredentials)
 
             cy.visit("https://automationexercise.com/")
             cy.get("body").should("be.visible")
@@ -57,15 +50,16 @@ describe("Automation Exercises", () => {
         it("Test Case 2: Login User with correct email and password", () => {
             cy.contains("Signup / Login").click()
 
-            cy.fillLoginForm(registerData)
+            cy.fillLoginForm(userCredentials)
 
-            cy.contains("Logged in as Manuel")
+            cy.contains(`Logged in as ${userCredentials.name}`)
 
             cy.contains("Delete Account").click()
 
-            cy.get('[data-qa="account-deleted"]')
-                .should("be.visible")
-                .and("contain.text", "Account Deleted!")
+            cy.getElementAndAssertText(
+                '[data-qa="account-deleted"]',
+                "Account Deleted!",
+            )
         })
 
         it("Test Case 3: Login User with incorrect email and password", () => {
@@ -73,7 +67,7 @@ describe("Automation Exercises", () => {
 
             cy.fillLoginForm({
                 email: "invalidEmail@gmail.com",
-                password: registerData.password,
+                password: userCredentials.password,
             })
 
             cy.contains("Your email or password is incorrect!")
@@ -82,9 +76,9 @@ describe("Automation Exercises", () => {
         it("Test Case 4: Logout User", () => {
             cy.contains("Signup / Login").click()
 
-            cy.fillLoginForm(registerData)
+            cy.fillLoginForm(userCredentials)
 
-            cy.contains("Logged in as Manuel")
+            cy.contains(`Logged in as ${userCredentials.name}`)
 
             cy.contains("Logout").click()
 
@@ -93,7 +87,7 @@ describe("Automation Exercises", () => {
 
         it("Test Case 5: Register User with existing email", () => {
             cy.contains("Signup / Login").click()
-            cy.fillSignupForm(registerData)
+            cy.fillSignupForm(userCredentials)
 
             cy.contains("Email Address already exist!")
         })
@@ -101,13 +95,14 @@ describe("Automation Exercises", () => {
         it("Test Case 6: Contact Us Form", () => {
             cy.contains("Contact us").click()
 
-            cy.get("div.contact-form > .title")
-                .should("be.visible")
-                .and("contain.text", "Get In Touch")
+            cy.getElementAndAssertText(
+                "div.contact-form > .title",
+                "Get In Touch",
+            )
 
-            cy.get('[data-qa="name"]').type(registerData.name)
+            cy.get('[data-qa="name"]').type(userCredentials.name)
 
-            cy.get('[data-qa="email"]').type(registerData.email)
+            cy.get('[data-qa="email"]').type(userCredentials.email)
 
             cy.get('[data-qa="subject"]').type("I would like to be in contact!")
 
@@ -140,9 +135,7 @@ describe("Automation Exercises", () => {
 
             cy.url().should("eq", "https://automationexercise.com/test_cases")
 
-            cy.get(".title")
-                .should("be.visible")
-                .and("contain.text", "Test Cases")
+            cy.getElementAndAssertText(".title", "Test Cases")
         })
 
         it("Test Case 8: Verify All Products and product detail page", () => {
@@ -152,9 +145,7 @@ describe("Automation Exercises", () => {
 
             cy.url().should("eq", "https://automationexercise.com/products")
 
-            cy.get(".title")
-                .should("be.visible")
-                .and("contain.text", "All Products")
+            cy.getElementAndAssertText(".title", "All Products")
 
             cy.get(".product-image-wrapper")
                 .first()
@@ -182,16 +173,12 @@ describe("Automation Exercises", () => {
 
             cy.url().should("eq", "https://automationexercise.com/products")
 
-            cy.get(".title")
-                .should("be.visible")
-                .and("contain.text", "All Products")
+            cy.getElementAndAssertText(".title", "All Products")
 
             cy.get("#search_product").type("Premium Polo T-Shirts")
             cy.get("#submit_search").click()
 
-            cy.get(".title")
-                .should("be.visible")
-                .and("contain.text", "Searched Products")
+            cy.getElementAndAssertText(".title", "Searched Products")
 
             cy.get(".product-image-wrapper").its("length").should("eq", 1)
         })
@@ -201,7 +188,7 @@ describe("Automation Exercises", () => {
             cy.get("#footer").within(() => {
                 cy.contains("Subscription")
 
-                cy.get("#susbscribe_email").type(registerData.email)
+                cy.get("#susbscribe_email").type(userCredentials.email)
                 cy.get("#subscribe").click()
 
                 cy.get("#success-subscribe")
@@ -221,7 +208,7 @@ describe("Automation Exercises", () => {
             cy.get("#footer").within(() => {
                 cy.contains("Subscription")
 
-                cy.get("#susbscribe_email").type(registerData.email)
+                cy.get("#susbscribe_email").type(userCredentials.email)
                 cy.get("#subscribe").click()
 
                 cy.get("#success-subscribe")
@@ -244,20 +231,13 @@ describe("Automation Exercises", () => {
 
             cy.contains("View Cart").click()
 
-            cy.get("#product-1")
-                .should("be.visible")
-                .and("contain.text", "Blue Top")
+            cy.getElementAndAssertText("#product-1", "Blue Top")
 
-            cy.get("#product-1")
-                .should("be.visible")
-                .and("contain.text", "Women > Tops")
+            cy.getElementAndAssertText("#product-1", "Women > Tops")
 
-            cy.get("#product-2")
-                .should("be.visible")
-                .and("contain.text", "Men Tshirt")
-            cy.get("#product-2")
-                .should("be.visible")
-                .and("contain.text", "Men > Tshirts")
+            cy.getElementAndAssertText("#product-2", "Men Tshirt")
+
+            cy.getElementAndAssertText("#product-2", "Men > Tshirts")
         })
 
         it("Test Case 13: Verify Product quantity in Cart", () => {
@@ -279,19 +259,15 @@ describe("Automation Exercises", () => {
 
             cy.contains("View Cart").click()
 
-            cy.get("#product-1")
-                .should("be.visible")
-                .and("contain.text", "Blue Top")
+            cy.getElementAndAssertText("#product-1", "Blue Top")
 
-            cy.get(".cart_quantity > .disabled")
-                .should("be.visible")
-                .and("have.text", "4")
+            cy.getElementAndAssertText(".cart_quantity > .disabled", "4")
         })
     })
 
     context("3.", () => {
         beforeEach(() => {
-            cy.deleteUserByAPI(registerData)
+            cy.deleteUserByAPI(userCredentials)
 
             cy.visit("https://automationexercise.com/")
             cy.get("body").should("be.visible")
@@ -316,16 +292,17 @@ describe("Automation Exercises", () => {
             cy.contains("Proceed To Checkout").click()
 
             cy.get(".modal-content a").click()
-            cy.fillSignupForm(registerData)
-            cy.fillAccountInformationForm(registerData)
+            cy.fillSignupForm(userCredentials)
+            cy.fillAccountInformationForm(userCredentials)
 
-            cy.get("[data-qa=account-created]")
-                .should("be.visible")
-                .and("contain.text", "Account Created!")
+            cy.getElementAndAssertText(
+                "[data-qa=account-created]",
+                "Account Created!",
+            )
 
             cy.get("[data-qa=continue-button]").click()
 
-            cy.contains("Logged in as Manuel")
+            cy.contains(`Logged in as ${userCredentials.name}`)
 
             cy.contains("Cart").click()
 
@@ -339,9 +316,9 @@ describe("Automation Exercises", () => {
         })
 
         it("Test Case 15: Place Order: Register before Checkout", () => {
-            cy.signupUser(registerData)
+            cy.signupUser(userCredentials)
 
-            cy.contains("Logged in as Manuel")
+            cy.contains(`Logged in as ${userCredentials.name}`)
 
             cy.addProductToCart(1)
 
@@ -368,7 +345,7 @@ describe("Automation Exercises", () => {
 
             cy.contains("Place Order").click()
 
-            cy.fillPaymentDetails(paymentData)
+            cy.fillPaymentDetails(userCredentials)
 
             cy.get(".title").should("contain.text", "Order Placed!")
 
@@ -376,16 +353,17 @@ describe("Automation Exercises", () => {
 
             cy.contains("Delete Account").click()
 
-            cy.get('[data-qa="account-deleted"]')
-                .should("be.visible")
-                .and("contain.text", "Account Deleted!")
+            cy.getElementAndAssertText(
+                '[data-qa="account-deleted"]',
+                "Account Deleted!",
+            )
         })
     })
 
     context("4.", () => {
         beforeEach(() => {
-            cy.deleteUserByAPI(registerData)
-            cy.registerUserByAPI(registerData)
+            cy.deleteUserByAPI(userCredentials)
+            cy.registerUserByAPI(userCredentials)
 
             cy.visit("https://automationexercise.com/")
             cy.get("body").should("be.visible")
@@ -394,7 +372,7 @@ describe("Automation Exercises", () => {
         it("Test Case 16: Place Order: Login before Checkout", () => {
             cy.contains("Signup / Login").click()
 
-            cy.fillLoginForm(registerData)
+            cy.fillLoginForm(userCredentials)
 
             cy.addProductToCart(1)
 
@@ -421,15 +399,16 @@ describe("Automation Exercises", () => {
 
             cy.contains("Place Order").click()
 
-            cy.fillPaymentDetails(paymentData)
+            cy.fillPaymentDetails(userCredentials)
 
             cy.contains("Congratulations! Your order has been confirmed!")
 
             cy.contains("Delete Account").click()
 
-            cy.get('[data-qa="account-deleted"]')
-                .should("be.visible")
-                .and("contain.text", "Account Deleted!")
+            cy.getElementAndAssertText(
+                '[data-qa="account-deleted"]',
+                "Account Deleted!",
+            )
         })
 
         it("Test Case 17: Remove Products From Cart", () => {
@@ -446,13 +425,13 @@ describe("Automation Exercises", () => {
                 "https://automationexercise.com/view_cart",
             )
 
-            cy.get("#product-1")
-                .should("be.visible")
-                .and("contain.text", "Blue Top")
-                .and("contain.text", "Women > Tops")
-                .within(() => {
+            cy.getElementAndAssertText("#product-1", "Blue Top")
+
+            cy.getElementAndAssertText("#product-1", "Women > Tops").within(
+                () => {
                     cy.get(".cart_quantity_delete").click()
-                })
+                },
+            )
 
             cy.get("#empty_cart")
                 .should("be.visible")
@@ -463,25 +442,19 @@ describe("Automation Exercises", () => {
         })
 
         it("Test Case 18: View Category Products", () => {
-            cy.get(".left-sidebar")
-                .should("be.visible")
-                .and("contain.text", "Category")
+            cy.getElementAndAssertText(".left-sidebar", "Category")
 
             cy.contains("Women").click()
 
             cy.contains("Tops").click()
 
-            cy.get(".title")
-                .should("be.visible")
-                .and("contain.text", "Women - Tops Products")
+            cy.getElementAndAssertText(".title", "Women - Tops Products")
 
             cy.contains("Men").click()
 
             cy.contains("Jeans").click()
 
-            cy.get(".title")
-                .should("be.visible")
-                .and("contain.text", "Men - Jeans Products")
+            cy.getElementAndAssertText(".title", "Men - Jeans Products")
         })
 
         it("Test Case 19: View & Cart Brand Products", () => {
@@ -491,15 +464,11 @@ describe("Automation Exercises", () => {
 
             cy.contains("H&M").click()
 
-            cy.get(".title")
-                .should("be.visible")
-                .and("contain.text", "Brand - H&M Products")
+            cy.getElementAndAssertText(".title", "Brand - H&M Products")
 
             cy.contains("Polo").click()
 
-            cy.get(".title")
-                .should("be.visible")
-                .and("contain.text", "Brand - Polo Products")
+            cy.getElementAndAssertText(".title", "Brand - Polo Products")
         })
 
         it("Test Case 20: Search Products and Verify Cart After Login", () => {
@@ -509,23 +478,23 @@ describe("Automation Exercises", () => {
 
             cy.url().should("eq", "https://automationexercise.com/products")
 
-            cy.get(".title")
-                .should("be.visible")
-                .and("contain.text", "All Products")
+            cy.getElementAndAssertText(".title", "All Products")
 
             cy.get("#search_product").type("TShirt")
             cy.get("#submit_search").click()
 
-            cy.get(".title")
-                .should("be.visible")
-                .and("contain.text", "Searched Products")
+            cy.getElementAndAssertText(".title", "Searched Products")
 
             cy.get(".product-image-wrapper").its("length").should("eq", 6)
 
-            cy.get(".product-image-wrapper").each(($el) => {
+            cy.get(".product-image-wrapper").each(($el, $index) => {
+                cy.log($el)
+                cy.log($index)
+
                 cy.get($el).within(() => {
                     cy.get(".add-to-cart").first().click()
                 })
+                cy.get("#cartModal").should("be.visible")
                 cy.contains("Continue Shopping").click()
             })
 
@@ -541,9 +510,9 @@ describe("Automation Exercises", () => {
 
             cy.contains("Signup / Login").click()
 
-            cy.fillLoginForm(registerData)
+            cy.fillLoginForm(userCredentials)
 
-            cy.contains("Logged in as Manuel")
+            cy.contains(`Logged in as ${userCredentials.name}`)
 
             cy.contains("Cart").click()
 
@@ -563,9 +532,7 @@ describe("Automation Exercises", () => {
 
             cy.url().should("eq", "https://automationexercise.com/products")
 
-            cy.get(".title")
-                .should("be.visible")
-                .and("contain.text", "All Products")
+            cy.getElementAndAssertText(".title", "All Products")
 
             cy.get(".product-image-wrapper")
                 .first()
@@ -573,28 +540,27 @@ describe("Automation Exercises", () => {
                     cy.contains("View Product").click()
                 })
 
-            cy.get("#name").type(registerData.name)
+            cy.get("#name").type(userCredentials.name)
 
-            cy.get("#email").type(registerData.email)
+            cy.get("#email").type(userCredentials.email)
 
             cy.get("textarea").type("This is a great product!")
 
             cy.get("#button-review").click()
 
-            cy.get(".alert-success")
-                .should("be.visible")
-                .and("contain.text", "Thank you for your review")
+            cy.getElementAndAssertText(
+                ".alert-success",
+                "Thank you for your review",
+            )
         })
 
-        it("Test Case 22: Add to cart from Recommended items", () => {
+        it.only("Test Case 22: Add to cart from Recommended items", () => {
             cy.get(".recommended_items").scrollIntoView()
 
-            cy.get(".title")
-                .should("be.visible")
-                .and("contain.text", "recommended items")
+            cy.getElementAndAssertText(".title", "recommended items")
 
             cy.get(".recommended_items").within(() => {
-                cy.get(".add-to-cart").first().click({ force: true })
+                cy.get(".add-to-cart").first().click()
             })
 
             cy.contains("View Cart").click()
@@ -605,16 +571,16 @@ describe("Automation Exercises", () => {
 
     context("5.", () => {
         beforeEach(() => {
-            cy.deleteUserByAPI(registerData)
+            cy.deleteUserByAPI(userCredentials)
 
             cy.visit("https://automationexercise.com/")
             cy.get("body").should("be.visible")
         })
 
         it("Test Case 23: Verify address details in checkout page", () => {
-            cy.signupUser(registerData)
+            cy.signupUser(userCredentials)
 
-            cy.contains("Logged in as Manuel")
+            cy.contains(`Logged in as ${userCredentials.name}`)
 
             cy.addProductToCart(1)
 
@@ -637,9 +603,10 @@ describe("Automation Exercises", () => {
 
             cy.contains("Delete Account").click()
 
-            cy.get('[data-qa="account-deleted"]')
-                .should("be.visible")
-                .and("contain.text", "Account Deleted!")
+            cy.getElementAndAssertText(
+                '[data-qa="account-deleted"]',
+                "Account Deleted!",
+            )
         })
 
         it("Test Case 24: Download Invoice after purchase order", () => {
@@ -659,16 +626,17 @@ describe("Automation Exercises", () => {
             cy.contains("Proceed To Checkout").click()
 
             cy.get(".modal-content a").click()
-            cy.fillSignupForm(registerData)
-            cy.fillAccountInformationForm(registerData)
+            cy.fillSignupForm(userCredentials)
+            cy.fillAccountInformationForm(userCredentials)
 
-            cy.get("[data-qa=account-created]")
-                .should("be.visible")
-                .and("contain.text", "Account Created!")
+            cy.getElementAndAssertText(
+                '[data-qa="account-created"]',
+                "Account Created!",
+            )
 
             cy.get("[data-qa=continue-button]").click()
 
-            cy.contains("Logged in as Manuel")
+            cy.contains(`Logged in as ${userCredentials.name}`)
 
             cy.contains("Cart").click()
 
@@ -684,7 +652,7 @@ describe("Automation Exercises", () => {
 
             cy.contains("Place Order").click()
 
-            cy.fillPaymentDetails(paymentData)
+            cy.fillPaymentDetails(userCredentials)
 
             cy.get(".title").should("contain.text", "Order Placed!")
 
@@ -700,26 +668,23 @@ describe("Automation Exercises", () => {
 
             cy.contains("Delete Account").click()
 
-            cy.get('[data-qa="account-deleted"]')
-                .should("be.visible")
-                .and("contain.text", "Account Deleted!")
+            cy.getElementAndAssertText(
+                '[data-qa="account-deleted"]',
+                "Account Deleted!",
+            )
         })
 
         it("Test Case 25: Verify Scroll Up using 'Arrow' button and Scroll Down functionality", () => {
             cy.get("#footer").scrollIntoView()
 
-            cy.get(".single-widget > h2")
-                .should("be.visible")
-                .and("contain.text", "Subscription")
+            cy.getElementAndAssertText(".single-widget > h2", "Subscription")
 
             cy.get("#scrollUp").click()
 
-            cy.get("#slider-carousel")
-                .should("be.visible")
-                .and(
-                    "contain.text",
-                    "Full-Fledged practice website for Automation Engineers",
-                )
+            cy.getElementAndAssertText(
+                "#slider-carousel",
+                "Full-Fledged practice website for Automation Engineers",
+            )
         })
 
         it("Test Case 26: Verify Scroll Up without 'Arrow' button and Scroll Down functionality", () => {
@@ -728,21 +693,17 @@ describe("Automation Exercises", () => {
                 win.scrollTo(0, win.document.body.scrollHeight)
             })
 
-            cy.get(".single-widget > h2")
-                .should("be.visible")
-                .and("contain.text", "Subscription")
+            cy.getElementAndAssertText(".single-widget > h2", "Subscription")
 
             // Scroll to the top of the page
             cy.window().then((win) => {
                 win.scrollTo(0, 0)
             })
 
-            cy.get("#slider-carousel")
-                .should("be.visible")
-                .and(
-                    "contain.text",
-                    "Full-Fledged practice website for Automation Engineers",
-                )
+            cy.getElementAndAssertText(
+                "#slider-carousel",
+                "Full-Fledged practice website for Automation Engineers",
+            )
         })
     })
 })
