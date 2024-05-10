@@ -1,3 +1,11 @@
+# Automation Exercise - Cypress Tests
+
+The Automation Exercise [website](https://automationexercise.com/)  is a full-fledged website built for atuomation practice purposes.
+
+This project aims to complete all the tests cases outlined in https://automationexercise.com/test_cases
+
+It implements all such tests cases using the [Cypress](https://www.cypress.io/) testing  framework. The test cases are outlined below.
+
 # Test Case List
 
 ✅ = Automated Test Case implemented
@@ -5,7 +13,7 @@
 - ✅ Test Case 1: Register User
 - ✅ Test Case 2: Login User with correct email and password
 - ✅ Test Case 3: Login User with incorrect email and password
-- ✅  Test Case 4: Logout User
+- ✅ Test Case 4: Logout User
 - ✅ Test Case 5: Register User with existing email
 - ✅ Test Case 6: Contact Us Form
 - ✅ Test Case 7: Verify - Test Cases Page
