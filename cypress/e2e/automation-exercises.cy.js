@@ -554,10 +554,13 @@ describe("Automation Exercises", () => {
             )
         })
 
-        it.only("Test Case 22: Add to cart from Recommended items", () => {
+        it("Test Case 22: Add to cart from Recommended items", () => {
             cy.get(".recommended_items").scrollIntoView()
 
             cy.getElementAndAssertText(".title", "recommended items")
+
+            cy.get("#recommended-item-carousel > .left > .fa").click()
+            cy.get("#recommended-item-carousel > .right > .fa").click()
 
             cy.get(".recommended_items").within(() => {
                 cy.get(".add-to-cart").first().click()
