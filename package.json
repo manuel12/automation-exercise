@@ -4,7 +4,13 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test:chrome": "cypress run --browser chrome",
+        "test:firefox": "cypress run --browser firefox",
+        "test:edge": "cypress run --browser edge",
+        "test:electron": "cypress run --browser electron",
+        "test:all-browsers": "npm run test:chrome && npm run test:firefox && npm run test:edge && npm run test:electron",
+        "test:api": "cypress run --spec 'cypress/e2e/api/'",
+        "test:ui": "cypress run --spec 'cypress/e2e/ui/'"
     },
     "keywords": [],
     "author": "",
