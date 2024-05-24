@@ -9,12 +9,12 @@ require("cypress-downloadfile/lib/downloadFileCommand")
  */
 
 /**
- * Fills the login form with provided account data.
- * @param {Object} accountData - Object containing email and password.
+ * Fills the login form with provided user credentials.
+ * @param {Object} userCredentials - Object containing email and password.
  */
 
-Cypress.Commands.add("fillLoginForm", (accountData) => {
-    const { email, password } = accountData
+Cypress.Commands.add("fillLoginForm", (userCredentials) => {
+    const { email, password } = userCredentials
 
     cy.get(".login-form > h2")
         .should("be.visible")
@@ -26,12 +26,12 @@ Cypress.Commands.add("fillLoginForm", (accountData) => {
 })
 
 /**
- * Fills the signup form with provided account data.
- * @param {Object} accountData - Object containing name and email.
+ * Fills the signup form with provided user credentials.
+ * @param {Object} userCredentials - Object containing name and email.
  */
 
-Cypress.Commands.add("fillSignupForm", (accountData) => {
-    const { name, email } = accountData
+Cypress.Commands.add("fillSignupForm", (userCredentials) => {
+    const { name, email } = userCredentials
 
     cy.get(".signup-form > h2")
         .should("be.visible")
@@ -44,47 +44,47 @@ Cypress.Commands.add("fillSignupForm", (accountData) => {
 
 /**
  * Fills the account information form with provided data.
- * @param {Object} accountData - Object containing account information.
+ * @param {Object} userCredentials - Object containing account information.
  */
 
-Cypress.Commands.add("fillAccountInformationForm", (accountData) => {
+Cypress.Commands.add("fillAccountInformationForm", (userCredentials) => {
     cy.get(":nth-child(1) > b").should("be.visible")
 
     cy.get("#id_gender1").click()
-    cy.get("[data-qa=password]").type(accountData.password)
+    cy.get("[data-qa=password]").type(userCredentials.password)
 
-    cy.get("[data-qa=days]").select(accountData.days)
-    cy.get("[data-qa=months]").select(accountData.months)
-    cy.get("[data-qa=years]").select(accountData.years)
+    cy.get("[data-qa=days]").select(userCredentials.days)
+    cy.get("[data-qa=months]").select(userCredentials.months)
+    cy.get("[data-qa=years]").select(userCredentials.years)
 
     cy.get("#newsletter").click()
     cy.get("#optin").click()
 
-    cy.get("[data-qa=first_name]").type(accountData.firstName)
-    cy.get("[data-qa=last_name]").type(accountData.lastName)
+    cy.get("[data-qa=first_name]").type(userCredentials.firstName)
+    cy.get("[data-qa=last_name]").type(userCredentials.lastName)
 
-    cy.get("[data-qa=company]").type(accountData.company)
-    cy.get("[data-qa=address]").type(accountData.address)
+    cy.get("[data-qa=company]").type(userCredentials.company)
+    cy.get("[data-qa=address]").type(userCredentials.address)
 
-    cy.get("[data-qa=country]").select(accountData.country)
-    cy.get("[data-qa=state]").type(accountData.state)
-    cy.get("[data-qa=city]").type(accountData.city)
-    cy.get("[data-qa=zipcode]").type(accountData.zipcode)
+    cy.get("[data-qa=country]").select(userCredentials.country)
+    cy.get("[data-qa=state]").type(userCredentials.state)
+    cy.get("[data-qa=city]").type(userCredentials.city)
+    cy.get("[data-qa=zipcode]").type(userCredentials.zipcode)
 
-    cy.get("[data-qa=mobile_number]").type(accountData.mobile)
+    cy.get("[data-qa=mobile_number]").type(userCredentials.mobile)
 
     cy.get("[data-qa=create-account]").click()
 })
 
 /**
- * Signs up a user with provided account data.
- * @param {Object} accountData - Object containing account data.
+ * Signs up a user with provided user credentials.
+ * @param {Object} userCredentials - Object containing user credentials.
  */
 
-Cypress.Commands.add("signupUser", (accountData) => {
+Cypress.Commands.add("signupUser", (userCredentials) => {
     cy.contains("Signup / Login").click()
-    cy.fillSignupForm(accountData)
-    cy.fillAccountInformationForm(accountData)
+    cy.fillSignupForm(userCredentials)
+    cy.fillAccountInformationForm(userCredentials)
 
     cy.get("[data-qa=account-created]")
         .should("be.visible")
@@ -136,6 +136,12 @@ Cypress.Commands.add("getElementAndAssertText", (element, text) => {
     cy.get(element).should("be.visible").and("contain.text", text)
 })
 
+Cypress.Commands.add("searchProduct", (productQuery) => {
+    cy.get("#search_product").type(productQuery)
+
+    cy.get("#submit_search").click()
+})
+
 /**
  *
  *  --- API METHODS ---
@@ -148,7 +154,7 @@ Cypress.Commands.add("getElementAndAssertText", (element, text) => {
  * @returns {Object} - Object containing response from the API.
  */
 
-Cypress.Commands.add("getUserByAPI", (email) => {
+Cypress.Commands.add("getUserWithAPI", (email) => {
     return cy.request({
         method: "GET",
         url: `https://automationexercise.com/api/getUserDetailByEmail?email=${email}`,
@@ -157,50 +163,67 @@ Cypress.Commands.add("getUserByAPI", (email) => {
 })
 
 /**
- * Registers a user by making an API request.
- * @param {Object} accountData - Object containing account data.
+ * Logins a user by making an API request.
+ * @param {Object} userCredentials - Object containing user credentials.
  * @returns {Object} - Object containing response from the API.
  */
 
-Cypress.Commands.add("registerUserByAPI", (accountData) => {
+Cypress.Commands.add("loginUserWithAPI", (userCredentials) => {
+    const { email, password } = userCredentials
+    return cy.request({
+        method: "POST",
+        url: `https://automationexercise.com/api/verifyLogin`,
+        failOnStatusCode: false,
+        form: true,
+        body: { email, password },
+    })
+})
+
+/**
+ * Registers a user by making an API request.
+ * @param {Object} userCredentials - Object containing user credentials.
+ * @returns {Object} - Object containing response from the API.
+ */
+
+Cypress.Commands.add("registerUserWithAPI", (userCredentials) => {
     return cy.request({
         method: "POST",
         url: "https://automationexercise.com/api/createAccount",
         failOnStatusCode: false,
         form: true,
         body: {
-            name: accountData.name,
-            email: accountData.email,
-            password: accountData.password,
+            name: userCredentials.name,
+            email: userCredentials.email,
+            password: userCredentials.password,
 
-            birth_date: accountData.days,
-            birth_month: accountData.months,
-            birth_year: accountData.years,
+            birth_date: userCredentials.days,
+            birth_month: userCredentials.months,
+            birth_year: userCredentials.years,
 
-            firstname: accountData.firstName,
-            lastname: accountData.lastName,
+            firstname: userCredentials.firstName,
+            lastname: userCredentials.lastName,
 
-            company: accountData.company,
-            address1: accountData.address,
+            company: userCredentials.company,
+            address1: userCredentials.address,
 
-            country: accountData.country,
-            state: accountData.state,
-            city: accountData.city,
-            zipcode: accountData.zipcode,
+            country: userCredentials.country,
+            state: userCredentials.state,
+            city: userCredentials.city,
+            zipcode: userCredentials.zipcode,
 
-            mobile_number: accountData.mobile,
+            mobile_number: userCredentials.mobile,
         },
     })
 })
 
 /**
  * Deletes a user account by making an API request.
- * @param {Object} accountData - Object containing account data.
+ * @param {Object} userCredentials - Object containing user credentials.
  * @returns {Object} - Object containing response from the API.
  */
 
-Cypress.Commands.add("deleteUserByAPI", (accountData) => {
-    const { email, password } = accountData
+Cypress.Commands.add("deleteUserWithAPI", (userCredentials) => {
+    const { email, password } = userCredentials
     return cy.request({
         method: "DELETE",
         url: `https://automationexercise.com/api/deleteAccount`,
