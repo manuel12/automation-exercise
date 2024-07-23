@@ -93,7 +93,16 @@ Or if running from the CLI use one of the scripts found in package.json:
 
 ## Features
 
--   ???
+ - Test pyramid followed: 70/20/10
+ - Boundary validation tests
+ - Equivalence partitioning tests
+ - React component tests
+ - API tests
+ - UI functional tests(mocked & stubbed)
+ - End- to- end tests
+ - Accessibility tests
+ - Responsiveness test
+ - Visual tests
 
 ## Uses
 
